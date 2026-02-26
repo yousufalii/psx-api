@@ -8,6 +8,11 @@ import {
 } from 'typeorm';
 import { StockHolding } from './stock-holding.entity';
 
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -18,6 +23,15 @@ export class User {
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ select: false })
+  password: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @OneToMany(() => StockHolding, (holding) => holding.user, { cascade: true })
   holdings: StockHolding[];

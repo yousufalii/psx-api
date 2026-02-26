@@ -5,6 +5,7 @@ import { Cron } from '@nestjs/schedule';
 import * as puppeteer from 'puppeteer';
 import { Stock } from './entities/stock.entity';
 import { StockPriceHistory } from './entities/stock-price-history.entity';
+import { MarketGateway } from '../market/market.gateway';
 
 @Injectable()
 export class ScraperService {
@@ -18,6 +19,7 @@ export class ScraperService {
     private readonly stockRepository: Repository<Stock>,
     @InjectRepository(StockPriceHistory)
     private readonly stockPriceHistoryRepository: Repository<StockPriceHistory>,
+    private readonly marketGateway: MarketGateway,
   ) {}
 
   /**
@@ -152,6 +154,13 @@ export class ScraperService {
 
               await this.stockPriceHistoryRepository.save(priceHistory);
               priceRecordsInserted++;
+
+              // 3. Broadcast real-time update
+              this.marketGateway.broadcastPriceUpdate({
+                symbol: stockItem.symbol,
+                price: stockItem.price,
+                fetchedAt: priceHistory.fetchedAt,
+              });
             } catch (err) {
               // Handle error gracefully - continue execution
               this.logger.error(

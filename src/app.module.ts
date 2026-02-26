@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScraperModule } from './scraper/scraper.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { MarketModule } from './market/market.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -19,6 +21,8 @@ import { AppService } from './app.service';
     }),
     ScraperModule,
     UsersModule,
+    AuthModule,
+    MarketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

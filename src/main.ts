@@ -14,6 +14,8 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('users')
     .addTag('scraper')
+    .addTag('auth')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

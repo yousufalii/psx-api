@@ -1,15 +1,18 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { ScheduleModule } from "@nestjs/schedule";
-import { ScraperService } from "./scraper.service";
-import { ScraperController } from "./scraper.controller";
-import { Stock } from "./entities/stock.entity";
-import { StockPriceHistory } from "./entities/stock-price-history.entity";
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ScraperService } from './scraper.service';
+import { ScraperController } from './scraper.controller';
+import { Stock } from './entities/stock.entity';
+import { StockPriceHistory } from './entities/stock-price-history.entity';
+
+import { MarketModule } from '../market/market.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Stock, StockPriceHistory]),
     ScheduleModule.forRoot(),
+    MarketModule,
   ],
   controllers: [ScraperController],
   providers: [ScraperService],
