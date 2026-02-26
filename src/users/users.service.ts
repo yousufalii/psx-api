@@ -8,6 +8,7 @@ import { CreateHoldingDto } from './dto/create-holding.dto';
 import { UpdateHoldingDto } from './dto/update-holding.dto';
 import { ScraperService } from '../scraper/scraper.service';
 import { Stock } from '../scraper/entities/stock.entity';
+import { PortfolioService } from '../portfolio/portfolio.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     @InjectRepository(Stock)
     private readonly stockRepository: Repository<Stock>,
     private readonly scraperService: ScraperService,
+    private readonly portfolioService: PortfolioService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -93,49 +95,6 @@ export class UsersService {
   }
 
   async getPortfolio(userId: string) {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['holdings', 'holdings.stock'],
-    });
-
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
-
-    let totalPortfolioValue = 0;
-    const holdingsData = await Promise.all(
-      user.holdings.map(async (holding) => {
-        let currentPrice = 0;
-        try {
-          currentPrice = await this.scraperService.getLatestPrice(
-            holding.stock.symbol,
-          );
-        } catch (e) {
-          // Fallback if price history is missing
-        }
-        const value = Number(holding.quantity) * currentPrice;
-        totalPortfolioValue += value;
-
-        return {
-          symbol: holding.stock.symbol,
-          quantity: Number(holding.quantity),
-          purchasePrice: Number(holding.purchasePrice),
-          currentPrice,
-          value,
-        };
-      }),
-    );
-
-    const holdingsWithWeightage = holdingsData.map((h) => ({
-      ...h,
-      weightage:
-        totalPortfolioValue > 0 ? (h.value / totalPortfolioValue) * 100 : 0,
-    }));
-
-    return {
-      userId: user.id,
-      totalPortfolioValue,
-      holdings: holdingsWithWeightage,
-    };
+    return this.portfolioService.calculatePortfolio(userId);
   }
 }

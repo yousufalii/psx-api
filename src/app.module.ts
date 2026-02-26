@@ -4,6 +4,7 @@ import { ScraperModule } from './scraper/scraper.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MarketModule } from './market/market.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -23,6 +24,7 @@ import { AppService } from './app.service';
     UsersModule,
     AuthModule,
     MarketModule,
+    PortfolioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

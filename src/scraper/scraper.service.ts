@@ -6,6 +6,8 @@ import * as puppeteer from 'puppeteer';
 import { Stock } from './entities/stock.entity';
 import { StockPriceHistory } from './entities/stock-price-history.entity';
 import { MarketGateway } from '../market/market.gateway';
+import { PortfolioRecalculationService } from '../portfolio/portfolio-recalculation.service';
+import { DeltaRecalculationService } from '../portfolio/delta-recalculation.service';
 
 @Injectable()
 export class ScraperService {
@@ -20,6 +22,8 @@ export class ScraperService {
     @InjectRepository(StockPriceHistory)
     private readonly stockPriceHistoryRepository: Repository<StockPriceHistory>,
     private readonly marketGateway: MarketGateway,
+    private readonly portfolioRecalculationService: PortfolioRecalculationService,
+    private readonly deltaRecalculationService: DeltaRecalculationService,
   ) {}
 
   /**
@@ -161,6 +165,13 @@ export class ScraperService {
                 price: stockItem.price,
                 fetchedAt: priceHistory.fetchedAt,
               });
+
+              // 4. Trigger optimized delta-based portfolio recalculation
+              this.deltaRecalculationService.handleStockPriceUpdate(
+                stock.id,
+                stockItem.price,
+                stockItem.symbol,
+              );
             } catch (err) {
               // Handle error gracefully - continue execution
               this.logger.error(

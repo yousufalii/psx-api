@@ -48,7 +48,11 @@ export class MarketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      this.logger.log(`Client connected: ${user.email} (${client.id})`);
+      // Join user-specific room for targeted broadcasting
+      client.join(`user:${user.id}`);
+      this.logger.log(
+        `Client connected: ${user.email} (${client.id}) - Joined room: user:${user.id}`,
+      );
     } catch (e) {
       this.logger.error(`Connection authentication failed: ${e.message}`);
       client.disconnect();
