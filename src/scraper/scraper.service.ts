@@ -191,4 +191,29 @@ export class ScraperService {
       };
     }
   }
+
+  /**
+   * Fetches the latest price for a given stock symbol.
+   */
+  async getLatestPrice(symbol: string): Promise<number> {
+    const stock = await this.stockRepository.findOne({
+      where: { symbol },
+      relations: ['priceHistories'],
+    });
+
+    if (!stock) {
+      throw new Error(`Stock with symbol ${symbol} not found`);
+    }
+
+    if (!stock.priceHistories || stock.priceHistories.length === 0) {
+      return 0;
+    }
+
+    // Sort by fetchedAt descending to get the latest
+    const latest = stock.priceHistories.sort(
+      (a, b) => b.fetchedAt.getTime() - a.fetchedAt.getTime(),
+    )[0];
+
+    return Number(latest.price);
+  }
 }

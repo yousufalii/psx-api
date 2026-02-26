@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScraperModule } from './scraper/scraper.module';
+import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -17,6 +18,7 @@ import { AppService } from './app.service';
       synchronize: true,
     }),
     ScraperModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
